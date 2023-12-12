@@ -1,17 +1,108 @@
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.Scanner;
 
 public class odontoEstoque {
-static Scanner ler = new Scanner(System.in);
     
-public static void ShowProdutos() {        
+    public static final String ANSI_RESET = "\u001B[0m";
+    public static final String ANSI_RED = "\u001B[31m";
+    public static final String ANSI_GREEN = "\u001B[32m";
+    static Scanner ler = new Scanner(System.in);
+
+    //Método para carregar os dados salvos
+    public static void Carregar(int[] valor, String[] ProS) {
+        String DiretorioE = "C:\\Estoquee";
+        String ArquivoS = "SalvarEstoque.txt";
+        
+        // Este objeto representa o arquivo onde os dados do estoque são armazenados.
+        File arq = new File(DiretorioE, ArquivoS);
+        
+        // Verificação da Existência do Arquivo
+        if (arq.exists()) {
+            try {
+                // se caso existir ele lê o arquivo
+                Scanner scanner = new Scanner(arq);
+                
+                /* O programa entra em um loop que continua enquanto houver mais linhas no arquivo
+                e o índice i for menor que o comprimento do array valor. 
+                
+                -Lê a linha e divide-a em duas partes usando o delimitador ?:?.
+                -Se a linha tiver exatamente duas partes, atribui a primeira parte (nome do produto) 
+                ao array ProS e a segunda parte (quantidade) ao array valor. A quantidade é convertida 
+                de uma string para um inteiro usando Integer.parseInt().*/
+                int i = 0;
+                while (scanner.hasNextLine() && i < valor.length) {
+                    String linha = scanner.nextLine();
+                    String[] partes = linha.split(":");
+                    if (partes.length == 2) {
+                        ProS[i] = partes[0].trim();
+                        valor[i] = Integer.parseInt(partes[1].trim());
+                        i++;
+                    }
+                }
+
+                scanner.close();
+            
+            /*Se ocorrer uma exceção IOException durante a leitura do arquivo,
+            o programa imprime uma mensagem de erro.*/    
+            } catch (IOException e) {
+                System.out.println("Erro ao ler o arquivo: " + e.getMessage());
+            }
+        }
+    }
+
+    //Método para salvar.
+    public static void Salvar(int[] valor, String[] ProS) {
+
+        String DiretorioE = "C:\\Estoquee";
+        String ArquivoS = "SalvarEstoque.txt";
+
+        File dir = new File(DiretorioE);
+        if (!dir.exists()) {
+            if (dir.mkdir()) {
+                System.out.println(ANSI_GREEN + "Diretório criado com sucesso!" + ANSI_RESET);
+            } else {
+                System.out.println(ANSI_RED + "Erro na criação do diretório." + ANSI_RESET);
+                return;
+            }
+        }
+
+        File arq = new File(DiretorioE, ArquivoS);
+        try {
+            if (arq.createNewFile()) {
+                System.out.println(ANSI_GREEN + "Arquivo SalvarEstoque.txt criado com sucesso!" + ANSI_RESET);
+            } else {
+                //System.out.println(ANSI_RED + "Arquivo já existente." + ANSI_RESET);
+            }
+
+            FileWriter writer = new FileWriter(arq);
+            for (int i = 0; i < valor.length; i++) {
+                writer.write(ProS[i] + ": " + valor[i] + "\n");
+            }
+            writer.close();
+
+        } catch (IOException e) {
+            System.out.println(ANSI_RED + "Erro ao criar o arquivo: " + e.getMessage() + ANSI_RESET);
+        }
+
+    }
+
+    //Método Para exibir o menu.
+    public static void ExibirMenu() {
+        System.out.println("\n-----Gerenciamento de Estoque-----\n\n1- Adicionar/Repor estoque\n2- Remover estoque\n3- Verificar estoque\n4- Salvar e Fechar\n\n----------------------------------");
+    }
+
+    //Método para mostrar o menu.
+    public static void MostrarProdutos() {
         System.out.println("""
                           
-            Digite o número do produto que você deseja selecionar(Digite 0 para fechar):
+            Digite o número do produto que você deseja selecionar (Digite 0 para fechar):
                           
                 ------------Tabela dos Produtos------------
                           
                     1-Bandeja;
-                    2-Espelho cli¬nico;
+                    2-Espelho clínico;
                     3-Pinça;
                     4-Escovador;
                     5-Sonda exploradora;
@@ -20,19 +111,43 @@ public static void ShowProdutos() {
                     8-Placa de vidro;
                     9-Cubas;
                     10-Pote Dappen;""");
-        System.out.println("\n Escolha:");
+        System.out.println("\nEscolha:");
+    }
+
+    //Método Para exibir o estoque.
+    public static void ExibirEstoque(int[] valor, String[] ProS) {
+        int n = 0;
+        System.out.print("\n----------------------------------");
+        for (int produtos : valor) {
+            System.out.printf("\n|%2d - %-22s: %-3d|", n + 1, ProS[n], produtos);
+            n++;
+        }
+        System.out.print("\n----------------------------------\n\n");
+    }
+
+    //Método Para salvar e fechar.
+    public static void SalvarEncerrar(int[] valor, String[] ProS) {
+        Salvar(valor, ProS);
+        System.out.println(ANSI_GREEN + "Dados salvos. Encerrando o programa." + ANSI_RESET);
+        System.exit(0);
     }
 
     public static void main(String[] args) {
-        
-        int o,p,v,e = 0,r;
-        
-        int valor[] = new int[10];
-        
 
-        String ProS[] = new String[10];//{"Bandeja","Espelho cli-nico","Pinça","Escovador","Sonda exploradora","Esculpidor Hollemback","Seringa Carpule","Placa de vidro","Cubas","Pote Dappen",};
+        int o, p, v, r, e = 0;
+        /*
+        o - Opção do menu;
+        p - Produto selecionado;
+        v - Quantidade armazenada de cada produto;
+        r - Quantidade que deseja remover de cada produto;
+        e - Escolha das três opções após adicionar/remover produto;
+        */
+
+        int[] valor = new int[10];
+
+        String[] ProS = new String[10];
         ProS[0] = "Bandeja";
-        ProS[1] = "Espelho cli¬nico";
+        ProS[1] = "Espelho clínico";
         ProS[2] = "Pinça";
         ProS[3] = "Escovador";
         ProS[4] = "Sonda exploradora";
@@ -41,166 +156,169 @@ public static void ShowProdutos() {
         ProS[7] = "Placa de vidro";
         ProS[8] = "Cubas";
         ProS[9] = "Pote Dappen";
-                
-      do{
-          try{
-      System.out.println("\n\nEscolha:\n1- Adicionar/Repor estoque\n2- Remover estoque\n3- Verificar estoque\n4- Fechar");
-            o = ler.nextInt(); 
-            /*Nessas linhas de código, é mostrado um simples menu onde o usuário digita um valor desejado entre 1 e 4
-            e é armazenado na variável o(Opção).*/
-          } catch(Exception b ){            
-                    System.out.println("Valor não é um número ");
-                ler.nextLine();
-                continue;}
-          //Caso o usuário digitar um valor não inteiro ele mostra uma mensagem de erro.
-              switch (o) {
-                case 1 -> {  
-      do{
-          
-          ShowProdutos(); 
-          try { 
-            p=ler.nextInt();
-            /*Aqui é mostrado uma lista de produtos que pede para o usuário selecionar um deles digitando um número entre 1 e 10.*/          
-          } catch(Exception b ){
-                    System.out.println("Valor não é um número ");
-                ler.nextLine();
-                continue;}
-          //Caso o usuário digitar um valor não inteiro ele mostra uma mensagem de erro.
-        if(p==0){break;} 
-        //Se o valor digitado for 0 ele volta para o menu.
-        if(p>0 && p<11){ 
-                
-            do{
-                try{ 
-            System.out.printf("\nVoce selecionou %d. %s\n\nQuantos você quer adicionar?(Digite 0 para voltar) ",p,ProS[p-1]);
-            v=ler.nextInt();
-            //O usuário coloca um valor para ser armazenado no estoque na variável v
-                } catch(Exception b ){
-                    System.out.println("Valor não é um número ");
-                ler.nextLine();
-                continue;}
-                //Caso o usuário digitar um valor não inteiro ele mostra uma mensagem de erro.
-                if(v<0){System.out.println("Quantidade invalida."); continue;} 
-                //mensagem de erro caso o valor digitado em v for menor que 0.
-            if (v > 1000000){
-                    System.out.println("Limite do estoque atingido");
-            continue; }
-            //mensagem de erro caso o valor for maior que 1.000.000.
-            
-            valor[p-1] = valor[p-1]+v;  
-          //Cálculo para armazenar o valor de v digitado na array.
-            
-            if(v==0){System.out.printf("\nAdicionado com sucesso!\n\n");break;}
 
-            System.out.printf("Voce adicionou %d %s",v,ProS[p-1]);
-            do{
-                try{
-                System.out.println("\n\nEscolha:\n |1-Continuar | 2-Escolher outro produto| 3-Voltar para o menu|");
-                e=ler.nextInt();
-                //Na variável e recebe um número de 1 a 3 e leva o usuário para suas respectivas funções.
-                } catch(Exception b ){
-                    System.out.println("Valor não é um número ");
+        Carregar(valor, ProS);
+
+        do {
+            try {
+                ExibirMenu();
+                o = ler.nextInt();
+            } catch (Exception b) {
+                System.out.println(ANSI_RED + "Valor não é um número " + ANSI_RESET);
                 ler.nextLine();
-                continue;} 
-                //Caso o usuário digitar um valor não inteiro ele mostra uma mensagem de erro.
-                if(e==1){                          
-                            break;
-                        }else if(e==2){
-                            break;
-                        }else if(e==3){
-                            break;
-                        }else{
+                continue;
+            }
+            switch (o) {//switch das 4 opções.
+                case 1 -> {//Adicionar Produto.
+                    do {
+                        MostrarProdutos();
+                        try {
+                            p = ler.nextInt();
+                        } catch (Exception b) {
+                            System.out.println(ANSI_RED + "Valor não é um número " + ANSI_RESET);
+                            ler.nextLine();
                             continue;
                         }
-                    }while(true);
-            if(e==2){break;}
-            if(e==3){break;}
-            }while(true);
-            if(e==3){break;}          
-        }else{      
-            System.out.println("Opção Invalida.\n");
-            //mensagem de erro.
-            continue;        
-        }            
-      }while(true);
+                        if (p == 0) {
+                            break;
+                        }
+                        if (p > 0 && p < 11) {
+                            do {
+                                try {
+                                    System.out.printf("\nVocê selecionou %d. %s\n\nQuantos você quer adicionar? (Digite 0 para voltar) ", p, ProS[p - 1]);
+                                    v = ler.nextInt();
+                                } catch (Exception b) {
+                                    System.out.println(ANSI_RED + "Valor não é um número " + ANSI_RESET);
+                                    ler.nextLine();
+                                    continue;
+                                }
+                                if (v < 0) {
+                                    System.out.println(ANSI_RED + "Quantidade inválida." + ANSI_RESET);
+                                    continue;
+                                }
+                                if (v > 1000000) {
+                                    System.out.println(ANSI_RED + "Limite do estoque atingido" + ANSI_RESET);
+                                    continue;
+                                }
+
+                                valor[p - 1] = valor[p - 1] + v;
+
+                                if (v == 0) {
+                                    System.out.print(ANSI_GREEN + "\nAdicionado com sucesso!\n\n" + ANSI_RESET);
+                                    break;
+                                }
+
+                                System.out.printf(ANSI_GREEN + "Você adicionou %d %s", v, ProS[p - 1] + ANSI_RESET);
+                                do {
+                                    try {
+                                        System.out.println("\n\nEscolha:\n |1-Continuar | 2-Escolher outro produto| 3-Voltar para o menu|");
+                                        e = ler.nextInt();
+                                    } catch (Exception b) {
+                                        System.out.println(ANSI_RED + "Valor não é um número " + ANSI_RESET);
+                                        ler.nextLine();
+                                        continue;
+                                    }
+                                    if (e == 1) {
+                                        break;
+                                    } else if (e == 2) {
+                                        break;
+                                    } else if (e == 3) {
+                                        break;
+                                    } else {
+                                        System.out.println(ANSI_RED + "Opção Inválida.\n" + ANSI_RESET);
+                                    }
+                                } while (true);
+                                if (e == 2) {
+                                    break;
+                                }
+                                if (e == 3) {
+                                    break;
+                                }
+                            } while (true);
+                            if (e == 3) {
+                                break;
+                            }
+                        } else {
+                            System.out.print(ANSI_RED + "Opção Inválida.\n" + ANSI_RESET);
+                        }
+                    } while (true);
                 }
-                case 2 ->{
-                    do{                        
-                        ShowProdutos();
-                        try{
-            p=ler.nextInt();
-                        } catch(Exception b ){
-                    System.out.println("Valor não é um número ");
-                ler.nextLine();
-                continue;}
-                        //Caso o usuário digitar um valor não inteiro ele mostra uma mensagem de erro.
-        if(p==0){break;}  
-        if(p>0 && p<11){  
-            do{
-                try{
-            System.out.printf("\nVoce selecionou %d. %s\n\nQuantos você quer remover?(Digite 0 para voltar) ",p,ProS[p-1]);
-            r=ler.nextInt();
-            //O usuário coloca um valor para ser removido no estoque na variável r
-                } catch(Exception b ){
-                    System.out.println("Valor não é um número ");
-                ler.nextLine();
-                continue;}
-                //Caso o usuário digitar um valor não inteiro ele mostra uma mensagem de erro.
-                if(r>0 && valor[p-1]>=r){               
-            
-            valor[p-1] = valor[p-1]-r;
-            //Cálculo para armazenar o valor de v digitado na array.                     
-            
-            System.out.printf("Voce removeu %d %s",r,ProS[p-1]);
-                }else if(r==0){System.out.printf("\nRemovido com sucesso!\n\n");break;
-                }else{System.out.println("Quantidade invalida."); continue;}
-            do{
-                try {
-                System.out.println("\n\nEscolha:\n |1-Continuar | 2-Escolher outro produto| 3-Voltar para o menu|");
-                e=ler.nextInt();
-                //Na variável e recebe um número de 1 a 3 e leva o usuário para suas respectivas funções.
-                } catch(Exception b ){
-                    System.out.println("Valor não é um número ");
-                ler.nextLine();
-                continue;}
-                //Caso o usuário digitar um valor não inteiro ele mostra uma mensagem de erro.
-                        if(e==1){                          
-                            break;
-                        }else if(e==2){
-                            break;
-                        }else if(e==3){
-                            break;
-                        }else{
+                case 2 -> {//Remover Produto.
+                    do {
+                        MostrarProdutos();
+                        try {
+                            p = ler.nextInt();
+                        } catch (Exception b) {
+                            System.out.println(ANSI_RED + "Valor não é um número " + ANSI_RESET);
+                            ler.nextLine();
                             continue;
                         }
-                    }while(true);
-            if(e==2){break;}
-            if(e==3){break;}
-            }while(true);
-            if(e==3){break;}
-            
-        }else{      
-            System.out.println("Opção Invalida.\n");
-            //mensagem de erro.
-            continue;        
-        }              
-      }while(true);}
-                case 3 ->{
-                  int n = 0;
-                        System.out.printf("\n----------------------------------");
-                    for(int produtos : valor) {
-                        System.out.printf("\n|%2d - %-22s: %-3d|",n+1,ProS[n],produtos);
-                        n++; 
-                    }
-                    System.out.printf("\n----------------------------------");
+                        if (p == 0) {
+                            break;
+                        }
+                        if (p > 0 && p < 11) {
+                            do {
+                                try {
+                                    System.out.printf("\nVocê selecionou %d. %s\n\nQuantos você quer remover? (Digite 0 para voltar) ", p, ProS[p - 1]);
+                                    r = ler.nextInt();
+                                } catch (Exception b) {
+                                    System.out.println(ANSI_RED + "Valor não é um número " + ANSI_RESET);
+                                    ler.nextLine();
+                                    continue;
+                                }
+                                if (r > 0 && valor[p - 1] >= r) {
+                                    valor[p - 1] = valor[p - 1] - r;
+                                    System.out.printf(ANSI_GREEN + "Você removeu %d %s", r, ProS[p - 1] + ANSI_RESET);
+                                } else if (r == 0) {
+                                    System.out.print(ANSI_GREEN + "\nRemovido com sucesso!\n\n" + ANSI_RESET);
+                                    break;
+                                } else {
+                                    System.out.println(ANSI_RED + "Quantidade inválida." + ANSI_RESET);
+                                    continue;
+                                }
+                                do {
+                                    try {
+                                        System.out.println("\n\nEscolha:\n |1-Continuar | 2-Escolher outro produto| 3-Voltar para o menu|");
+                                        e = ler.nextInt();
+                                    } catch (Exception b) {
+                                        System.out.println(ANSI_RED + "Valor não é um número " + ANSI_RESET);
+                                        ler.nextLine();
+                                        continue;
+                                    }
+                                    if (e == 1) {
+                                        break;
+                                    } else if (e == 2) {
+                                        break;
+                                    } else if (e == 3) {
+                                        break;
+                                    } else {
+                                        System.out.print(ANSI_RED + "Opção Inválida.\n" + ANSI_RESET);
+                                    }
+                                } while (true);
+                                if (e == 2) {
+                                    break;
+                                }
+                                if (e == 3) {
+                                    break;
+                                }
+                            } while (true);
+                            if (e == 3) {
+                                break;
+                            }
+                        } else {
+                            System.out.print(ANSI_RED + "Opção Inválida.\n" + ANSI_RESET);
+                        }
+                    } while (true);
                 }
-                //Aqui é mostrado a quantidade de cada produto.
-                case 4 ->{System.out.close();}
-                //Nessa linha acima o código é finalizado.
-                default->{}
+                case 3 -> //Ver quantidade de Produtos.
+                    ExibirEstoque(valor, ProS);
+                case 4 -> //Salvar e fechar o programa.
+                    SalvarEncerrar(valor, ProS);
+                default -> System.out.println(ANSI_RED + "Opção Inválida.\n" + ANSI_RESET);
+            }
+            if (o == 4) {
+                break;
+            }
+        } while (true);
     }
-            if(o==4){break;}
-    }while(true);
-      
-      }  
-    }
+}
