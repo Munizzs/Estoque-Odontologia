@@ -9,6 +9,32 @@ public class odontoEstoque {
     public static final String ANSI_RED = "\u001B[31m";
     public static final String ANSI_GREEN = "\u001B[32m";
     static Scanner ler = new Scanner(System.in);
+    
+    //Método de login
+    public static void Login(){
+    
+       boolean account;
+       String user = null, password = null;
+     do{ 
+         
+         System.out.println("   ---LOGIN---");
+         
+         System.out.println("Type your username");
+         user=ler.nextLine();
+         
+         System.out.println("\nType your password");
+         password=ler.nextLine();
+         
+       if(user.equals("admin") && password.equals("admin")){
+           System.out.println(ANSI_GREEN + "\nAllowed user" + ANSI_RESET+"\n");
+           break;
+       }else{
+           System.out.println(ANSI_RED +"\nPassword or username is incorrect" + ANSI_RESET+"\n");
+           continue;
+       }   
+       }while(true);
+    }
+        
 
     //Método para carregar os dados salvos
     public static void Carregar(int[] valor, String[] ProS) {
@@ -158,13 +184,13 @@ public class odontoEstoque {
         ProS[9] = "Pote Dappen";
 
         Carregar(valor, ProS);
-
-        do {
+        Login();
+        do {           
             try {
                 ExibirMenu();
                 o = ler.nextInt();
             } catch (Exception b) {
-                System.out.println(ANSI_RED + "Valor não é um número " + ANSI_RESET);
+                System.out.println(ANSI_RED + "Valor não é um número inteiro positivo" + ANSI_RESET);
                 ler.nextLine();
                 continue;
             }
@@ -175,11 +201,14 @@ public class odontoEstoque {
                         try {
                             p = ler.nextInt();
                         } catch (Exception b) {
-                            System.out.println(ANSI_RED + "Valor não é um número " + ANSI_RESET);
+                            System.out.println(ANSI_RED + "Valor não é um número inteiro positivo" + ANSI_RESET);
                             ler.nextLine();
                             continue;
                         }
                         if (p == 0) {
+                            System.out.println("\n\nPressione Enter para continuar...\n\n");
+                            ler.nextLine();
+                            ler.nextLine();
                             break;
                         }
                         if (p > 0 && p < 11) {
@@ -203,8 +232,7 @@ public class odontoEstoque {
 
                                 valor[p - 1] = valor[p - 1] + v;
 
-                                if (v == 0) {
-                                    System.out.print(ANSI_GREEN + "\nAdicionado com sucesso!\n\n" + ANSI_RESET);
+                                if (v == 0) {    
                                     break;
                                 }
 
@@ -254,6 +282,9 @@ public class odontoEstoque {
                             continue;
                         }
                         if (p == 0) {
+                                    System.out.println("\n\nPressione Enter para continuar...\n\n");
+                                    ler.nextLine();
+                                    ler.nextLine();
                             break;
                         }
                         if (p > 0 && p < 11) {
@@ -269,8 +300,7 @@ public class odontoEstoque {
                                 if (r > 0 && valor[p - 1] >= r) {
                                     valor[p - 1] = valor[p - 1] - r;
                                     System.out.printf(ANSI_GREEN + "Você removeu %d %s", r, ProS[p - 1] + ANSI_RESET);
-                                } else if (r == 0) {
-                                    System.out.print(ANSI_GREEN + "\nRemovido com sucesso!\n\n" + ANSI_RESET);
+                                } else if (r == 0) {  
                                     break;
                                 } else {
                                     System.out.println(ANSI_RED + "Quantidade inválida." + ANSI_RESET);
@@ -310,8 +340,12 @@ public class odontoEstoque {
                         }
                     } while (true);
                 }
-                case 3 -> //Ver quantidade de Produtos.
+                case 3 -> {//Ver quantidade de Produtos.                   
                     ExibirEstoque(valor, ProS);
+                    System.out.println("\n\nPressione Enter para continuar...\n\n");
+                    ler.nextLine();
+                    ler.nextLine();
+                    }
                 case 4 -> //Salvar e fechar o programa.
                     SalvarEncerrar(valor, ProS);
                 default -> System.out.println(ANSI_RED + "Opção Inválida.\n" + ANSI_RESET);
