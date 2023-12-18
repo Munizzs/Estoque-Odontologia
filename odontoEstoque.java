@@ -11,6 +11,31 @@ public class odontoEstoque {
     static Scanner ler = new Scanner(System.in);
     static String NewC [][]= new String[10][2]; 
     
+    //Método para escolher criar login ou logar
+    public static void OpcaoLogin(){
+    int o = 0;
+        System.out.println("Bem vindo a o estoque odontologico");
+        do{
+        System.out.println("\n1- Sign on\n2- Sign up\n");
+        try {
+               o=ler.nextInt();
+            } catch (Exception b) {
+                System.out.println(ANSI_RED + "Valor não é um número inteiro positivo" + ANSI_RESET);
+                ler.nextLine();
+                continue;
+            }       
+            if(o==1){
+                Login();
+            }else if(o==2){
+               CreateNewLogin(); 
+            }else{
+                System.out.println(ANSI_RED +"opção invalida"+ANSI_RESET);
+                continue;
+            }
+            break;
+    }while(true);
+    }
+    
     //Método de Criar Conta
     public static void CreateNewLogin(){
         int conta = 0;
@@ -22,6 +47,7 @@ public class odontoEstoque {
          if (NewC[conta][0] == null && NewC[conta][1] == null){
         
         System.out.println("Type your new username");
+         NewC[conta][0]=ler.nextLine();
          NewC[conta][0]=ler.nextLine();
          
          System.out.println("\nType your new password");
@@ -45,12 +71,12 @@ public class odontoEstoque {
          
          System.out.println("   ---LOGIN---\n");
          
-         for (String[] linha : NewC) {
+        /* for (String[] linha : NewC) {
             for (String elemento : linha) {
                 System.out.print(elemento + " ");
             }
             System.out.println(); 
-        }
+        }*/
          
          System.out.println("\nType your username");
          user=ler.nextLine();
@@ -227,7 +253,8 @@ public class odontoEstoque {
         ProS[9] = "Pote Dappen";
 
         Carregar(valor, ProS);
-        CreateNewLogin();
+        OpcaoLogin();
+        //CreateNewLogin();
         //Login();
         do {           
             try {
