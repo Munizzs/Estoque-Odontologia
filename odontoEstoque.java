@@ -9,29 +9,72 @@ public class odontoEstoque {
     public static final String ANSI_RED = "\u001B[31m";
     public static final String ANSI_GREEN = "\u001B[32m";
     static Scanner ler = new Scanner(System.in);
+    static String NewC [][]= new String[10][2]; 
+    
+    //Método de Criar Conta
+    public static void CreateNewLogin(){
+        int conta = 0;
+        
+        System.out.println("   ---NEW LOGIN---");
+         
+         boolean account;
+         do{
+         if (NewC[conta][0] == null && NewC[conta][1] == null){
+        
+        System.out.println("Type your new username");
+         NewC[conta][0]=ler.nextLine();
+         
+         System.out.println("\nType your new password");
+         NewC[conta][1]=ler.nextLine();
+         Login();
+         break;
+         
+         }else{
+         conta++;
+         continue;       
+         }        
+         }while(true);
+    }
     
     //Método de login
     public static void Login(){
     
-       boolean account;
+       int cont = 0;
        String user = null, password = null;
      do{ 
          
-         System.out.println("   ---LOGIN---");
+         System.out.println("   ---LOGIN---\n");
          
-         System.out.println("Type your username");
+         for (String[] linha : NewC) {
+            for (String elemento : linha) {
+                System.out.print(elemento + " ");
+            }
+            System.out.println(); 
+        }
+         
+         System.out.println("\nType your username");
          user=ler.nextLine();
          
          System.out.println("\nType your password");
          password=ler.nextLine();
+        
          
-       if(user.equals("admin") && password.equals("admin")){
+         do{
+         if(user.equals(NewC[cont][0]) && password.equals(NewC[cont][1])){
+              
            System.out.println(ANSI_GREEN + "\nAllowed user" + ANSI_RESET+"\n");
            break;
-       }else{
+       }else if (NewC[cont][0] == null && NewC[cont][1] == null){
            System.out.println(ANSI_RED +"\nPassword or username is incorrect" + ANSI_RESET+"\n");
-           continue;
-       }   
+           continue;    
+           
+       }else{
+       cont++;
+       continue;
+       }
+         
+         }while(true);
+         break;
        }while(true);
     }
         
@@ -184,7 +227,8 @@ public class odontoEstoque {
         ProS[9] = "Pote Dappen";
 
         Carregar(valor, ProS);
-        Login();
+        CreateNewLogin();
+        //Login();
         do {           
             try {
                 ExibirMenu();
