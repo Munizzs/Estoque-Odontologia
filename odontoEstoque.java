@@ -42,29 +42,28 @@ public class odontoEstoque {
         
         System.out.println("   ---NEW LOGIN---");
          
-         boolean account;
          do{
-         if (NewC[conta][0] == null && NewC[conta][1] == null){
+         if (NewC[conta][0] != null && NewC[conta][1] != null){
         
-        System.out.println("Type your new username");
-         NewC[conta][0]=ler.nextLine();
-         NewC[conta][0]=ler.nextLine();
-         
-         System.out.println("\nType your new password");
-         NewC[conta][1]=ler.nextLine();
-         Login();
-         break;
+            conta++;
+            continue; 
          
          }else{
-         conta++;
-         continue;       
+            System.out.println("Type your new username");
+            NewC[conta][0]=ler.next();
+
+            System.out.println("\nType your new password");
+            NewC[conta][1]=ler.next();
+
+            OpcaoLogin();
+            break;
          }        
          }while(true);
     }
     
     //Método de login
     public static void Login(){
-    
+    carregarLog();
        int cont = 0;
        String user = null, password = null;
      do{ 
@@ -79,10 +78,11 @@ public class odontoEstoque {
         }*/
          
          System.out.println("\nType your username");
-         user=ler.nextLine();
+         user=ler.next();
+
          
          System.out.println("\nType your password");
-         password=ler.nextLine();
+         password=ler.next();
         
          
          do{
@@ -92,7 +92,7 @@ public class odontoEstoque {
            break;
        }else if (NewC[cont][0] == null && NewC[cont][1] == null){
            System.out.println(ANSI_RED +"\nPassword or username is incorrect" + ANSI_RESET+"\n");
-           continue;    
+           break;    
            
        }else{
        cont++;
@@ -100,11 +100,43 @@ public class odontoEstoque {
        }
          
          }while(true);
+         if(NewC[cont][0] == null && NewC[cont][1] == null){continue;}
          break;
        }while(true);
     }
         
+    //Método para carregar os dados salvos Login
+    public static void carregarLog(){
+        String DiretorioE = "C:\\Estoquee";
+        String arquivoLog = "SalvarLogin.txt";
+        
+        File arqLog = new File(DiretorioE, arquivoLog);
+        
+         if (arqLog.exists()) {
+            try {               
+                Scanner scanner = new Scanner(arqLog);
+                
+                int i = 0;
+                while (scanner.hasNextLine() && i < NewC.length) {
+                    String linha = scanner.nextLine();
+                    String[] partes = linha.split(" ");
+                    if (partes.length == 2) {
+                        NewC[i][0] = partes[0].trim();
+                        NewC[i][1] = partes[1].trim();
+                        i++;
+                    }
+                }
 
+                scanner.close();
+            
+            /*Se ocorrer uma exceção IOException durante a leitura do arquivo,
+            o programa imprime uma mensagem de erro.*/    
+            } catch (IOException e) {
+                System.out.println("Erro ao ler o arquivo: " + e.getMessage());
+            }
+        }
+    }
+    
     //Método para carregar os dados salvos
     public static void Carregar(int[] valor, String[] ProS) {
         String DiretorioE = "C:\\Estoquee";
@@ -152,6 +184,7 @@ public class odontoEstoque {
 
         String DiretorioE = "C:\\Estoquee";
         String ArquivoS = "SalvarEstoque.txt";
+        String arquivoLog = "SalvarLogin.txt";
 
         File dir = new File(DiretorioE);
         if (!dir.exists()) {
@@ -162,13 +195,29 @@ public class odontoEstoque {
                 return;
             }
         }
+        
+        File arqlog = new File(DiretorioE,arquivoLog);
+        try{
+            if(arqlog.createNewFile()){
+                System.out.println(ANSI_GREEN + "Arquivo SalvarLogin.txt criado com sucesso!" + ANSI_RESET);
+            }else{
+                System.out.print(".");//arquivo ja existente.
+            }
+                FileWriter LogEsc = new FileWriter(arqlog);
+                for (int i = 0;i < NewC.length; i++){
+                    LogEsc.write(NewC[i][0]+" "+NewC[i][1]+"\n");
+                }
+                    LogEsc.close();
+        }catch(IOException e){
+            System.out.println(ANSI_RED + "Erro ao criar o arquivo: " + e.getMessage() + ANSI_RESET);
+        }
 
         File arq = new File(DiretorioE, ArquivoS);
         try {
             if (arq.createNewFile()) {
                 System.out.println(ANSI_GREEN + "Arquivo SalvarEstoque.txt criado com sucesso!" + ANSI_RESET);
             } else {
-                //System.out.println(ANSI_RED + "Arquivo já existente." + ANSI_RESET);
+                System.out.print( ".");//arquivo ja existente.
             }
 
             FileWriter writer = new FileWriter(arq);
